@@ -1,0 +1,9 @@
+{
+  "upstream": "https://github.com/Wunsch2048/codex-bailong-desktop-pet",
+  "source_tree_sha": "7518c51f8c216e2043c1bb5895b34bb719ca59df",
+  "upstream_source_version": "0.8.3",
+  "material_release": "0.7.9",
+  "linux_port_version": "0.8.3-linux.1",
+  "scope": "public Linux adaptation source; character animations distributed separately",
+  "repository": "https://github.com/shiki-sl/bailong-linux"
+}
