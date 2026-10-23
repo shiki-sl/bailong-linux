@@ -6,7 +6,7 @@
 
 ## 使用
 
-安装后从应用菜单打开“白龙桌宠”，或运行 `bailong-pet`。
+首次使用请按下方“下载与运行”准备源码、Python 环境和动画素材，再运行 `./start-linux.sh`。已安装桌面入口的本机也可从应用菜单打开“白龙桌宠”，或运行 `bailong-pet`。
 
 - 点击人物、右键菜单及托盘可打开卡片、设置和日报；托盘点击可找回人物。
 - 额度通过当前用户的 Codex CLI 查询，Token 按本机 Codex 日志增量统计。未提供的额度窗口保持未知；不补造 5 小时额度。
@@ -26,7 +26,7 @@
 
 这两项 Codex 指标可直接在白龙查看，无须另外打开 Token Monitor。Monitor 应用、入口、历史和自启设置均保留。
 
-程序安装于 `~/.local/share/bailong-linux/`，启动命令位于 `~/.local/bin/bailong-pet`，应用入口位于 `~/.local/share/applications/bailong-linux.desktop`。运行数据位于 `${XDG_DATA_HOME:-~/.local/share}/BailongEnhanced/`，与 Codex 数据分开。
+本机已安装版本位于 `~/.local/share/bailong-linux/`，启动命令位于 `~/.local/bin/bailong-pet`，应用入口位于 `~/.local/share/applications/bailong-linux.desktop`。下面的源码运行步骤不会自动创建这些入口。运行数据位于 `${XDG_DATA_HOME:-~/.local/share}/BailongEnhanced/`，与 Codex 数据分开。
 
 ## Linux 兼容边界
 
@@ -36,7 +36,7 @@
 - Windows 安装器和程序更新不能用于此 Linux 版本，下载和安装入口已阻止。源码与 Python 依赖需要单独维护。
 - 统计只覆盖当前电脑可读的日志；无法据此汇总其他机器的消耗。额度查询失败、旧缓存、部分日志错误分别保留状态。
 
-## 从源码运行
+## 下载与运行
 
 需要 Python 3.12、uv 和现有桌面环境。Wayland 下还需可用的 XWayland；聊天密钥功能需要系统 Secret Service 与 `secret-tool`。随仓库保留的 Tokscale 原生采集器用于 Linux x86_64 / glibc，其他架构需自行准备兼容版本。
 
@@ -52,14 +52,24 @@ uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -r requirements-linux.txt
 ```
 
-Git 历史不包含大型角色动画，运行前需另行准备匹配的素材；这个仓库当前提供源码，不提供 Linux 安装包或动画 Release。已有本机 Linux 安装时，可复制它的素材目录：
+动画单独发布在本仓库的 [512px 素材 Release](https://github.com/shiki-sl/bailong-linux/releases/tag/materials-light-8849481e60e0b3f2314ec6a0)，不进入 Git 历史。下载完整素材 ZIP 和校验文件，在仓库根目录执行：
 
 ```sh
-cp -a "${XDG_DATA_HOME:-$HOME/.local/share}/bailong-linux/current/outputs/白龙桌宠素材/." "outputs/白龙桌宠素材/"
+BAILONG_MATERIALS_URL='https://github.com/shiki-sl/bailong-linux/releases/download/materials-light-8849481e60e0b3f2314ec6a0'
+curl -fL --retry 3 -O "$BAILONG_MATERIALS_URL/bailong-light-8849481e60e0b3f2314ec6a0.zip"
+curl -fL --retry 3 -O "$BAILONG_MATERIALS_URL/SHA256SUMS.txt"
+sha256sum -c SHA256SUMS.txt
+.venv/bin/python -m zipfile -e bailong-light-8849481e60e0b3f2314ec6a0.zip .
 ./start-linux.sh
 ```
 
-其他机器须从 [Windows 上游 Release](https://github.com/Wunsch2048/codex-bailong-desktop-pet/releases) 准备同版本的完整 `outputs/白龙桌宠素材/` 目录。动画文件及 `素材清单.json` 必须匹配 `app/material_catalog.json` 中 light 档的尺寸与 SHA-256；512px 默认素材和 720px 高清素材不能混用，文档演示图不能替代动画。
+请逐条执行：校验必须显示 `OK`，失败时重新下载，停止解压和启动。也可从 Release 页面手动下载这两个文件后执行校验、解压和启动命令。
+
+素材包约 590 MiB，包含 `outputs/白龙桌宠素材/` 下的 31 个动画 WebP、`素材清单.json`，以及三份来源/授权说明；解压后直接形成程序需要的目录，不需要运行 Windows EXE。`material-manifest.json` 提供逐文件大小和 SHA-256。素材 ID 为 `8849481e60e0b3f2314ec6a0`，与源码 `app/material_catalog.json` 的 light 档完全匹配。
+
+此 Release 是资源专用预发布，不提供 Linux 安装器。512px 默认素材和 720px 高清素材不能混用，文档演示图不能替代动画。角色和动画的来源与使用范围见 [NOTICE.md](NOTICE.md)；公开下载不额外授予商用或再分发许可。
+
+运行时请先在这台电脑安装并登录 Codex CLI；额度和会话读取使用你自己的本机登录。源码环境与素材解压完成后，后续启动只需在仓库目录执行 `./start-linux.sh`。登录自启、随 Codex 启动和聊天服务均按需在设置中启用；聊天服务另需自行配置密钥。
 
 Tokscale 的可执行文件、许可证和公共价格种子随源码保留，来源及 SHA-256 见 [vendor/tokscale/PROVENANCE.json](vendor/tokscale/PROVENANCE.json)。运行后生成的使用记录和缓存位于用户数据目录，不提交到仓库。
 
